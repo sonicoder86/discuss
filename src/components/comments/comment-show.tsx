@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import CommentCreateForm from '@/components/comments/comment-create-form'
-import { CommentWithAuthor } from '@/db/queries/comments'
+import { fetchCommentsByPostId } from '@/db/queries/comments'
 
 interface CommentShowProps {
+  postId: string
   commentId: string
-  comments: CommentWithAuthor[]
 }
 
-export default function CommentShow({ commentId, comments }: CommentShowProps) {
+export default async function CommentShow({ postId, commentId }: CommentShowProps) {
+  const comments = await fetchCommentsByPostId(postId)
   const comment = comments.find((c) => c.id === commentId);
 
   if (!comment) {
@@ -17,7 +18,7 @@ export default function CommentShow({ commentId, comments }: CommentShowProps) {
   const children = comments.filter((c) => c.parentId === commentId);
   const renderedChildren = children.map((child) => {
     return (
-      <CommentShow key={child.id} commentId={child.id} comments={comments} />
+      <CommentShow key={child.id} commentId={child.id} postId={postId} />
     );
   });
 
